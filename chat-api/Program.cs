@@ -19,7 +19,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
+builder.Services.AddCors(cfg =>
+{
+    cfg.AddPolicy("local-angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,5 +52,5 @@ app.MapPost("/chat-messages", async (PostChatMessageCommand command, ISender med
     if (Guid.Empty == productId) return Results.BadRequest();
     return Results.Created($"/products/{productId}", new { id = productId });
 });
-
+app.UseCors("local-angular");
 app.Run();

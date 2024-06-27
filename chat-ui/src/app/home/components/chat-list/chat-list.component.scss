@@ -1,0 +1,19 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    max-height: 100vh;
+}
+
+.list {
+    flex: 1;
+    min-width: 120px;
+    overflow: scroll;
+}
+
+.chat {
+    max-width: 120px;
+    margin: auto;
+}

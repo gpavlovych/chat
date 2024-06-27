@@ -1,0 +1,9 @@
+<form [formGroup]="formGroup" (submit)="onSubmit()">
+    <mat-form-field appearance="outline">
+        <input matInput placeholder="User Name" formControlName="userName">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <textarea matInput placeholder="Message" formControlName="message"></textarea>
+    </mat-form-field>
+    <button mat-raised-button [disabled]="!formGroup.valid">Send</button>
+</form>

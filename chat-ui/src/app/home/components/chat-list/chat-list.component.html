@@ -1,0 +1,8 @@
+<mat-list class="list">
+    <mat-list-item *ngFor="let chat of (chatMessages$ | async)">
+        <span matListItemTitle>{{chat.message}}</span>
+        <span matListItemLine>By: {{chat.userName}}</span>
+    </mat-list-item>
+</mat-list>
+
+<app-new-chat class="new-message" (chatMessageSubmit)="onChatMessageSubmit($event)"></app-new-chat>
