@@ -1,0 +1,11 @@
+// gitignore for asp.net api core
+# bin and obj folders
+bin/
+obj/
+
+*.user
+
+# Visual Studio files
+.vs/
+*.vscode/
+*.suo
