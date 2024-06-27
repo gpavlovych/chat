@@ -1,6 +1,11 @@
+using Chat.API.Features.Messaging.Commands.Post;
+using Chat.API.Features.Messaging.Queries.List;
+using Chat.API.Persistence;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 var app = builder.Build();
 
@@ -24,9 +31,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
 
-app.MapControllers();
+app.MapGet("/chat-messages", async (ISender mediatr) =>
+{
+    var products = await mediatr.Send(new ListChatMessagesQuery());
+    return Results.Ok(products);
+});
+
+app.MapPost("/chat-messages", async (PostChatMessageCommand command, ISender mediatr) =>
+{
+    var productId = await mediatr.Send(command);
+    if (Guid.Empty == productId) return Results.BadRequest();
+    return Results.Created($"/products/{productId}", new { id = productId });
+});
 
 app.Run();
