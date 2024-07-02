@@ -9,17 +9,18 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["chat-api.csproj", "."]
-RUN dotnet restore "./chat-api.csproj"
+COPY ["Chat.API.csproj", "."]
+RUN dotnet restore "./Chat.API.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./chat-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Chat.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./chat-api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Chat.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "chat-api.dll"]
+ENV ASPNETCORE_URLS=http://*:80/;http://*:8080/;https://*:443/;https://*:8081/
+ENTRYPOINT ["dotnet", "Chat.API.dll"]
