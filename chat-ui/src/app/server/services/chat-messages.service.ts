@@ -25,12 +25,9 @@ export class ChatMessagesService {
         .withUrl(`${environment.apiUrl}chat-hub`, {withCredentials: false})
         .build();
         hubConnection.on("ReceiveMessage", (data: ChatMessage) => {
-          console.log(data);
           observer.next(data);
         });
-        hubConnection.start()
-          .then(() => console.log('connection started'))
-          .catch((err) => console.log('error while establishing signalr connection: ' + err));
+        hubConnection.start();
         return () => {
           hubConnection.stop();
         }
