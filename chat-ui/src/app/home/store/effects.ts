@@ -1,13 +1,13 @@
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { ChatMessagesService } from "../../server/services/chat-messages.service";
-import { switchMap, map, catchError, of } from "rxjs";
-import { loadMessages, loadMessagesSuccess, loadMessagesFailure, postMessage, postMessageSuccess, postMessageFailure } from "./actions";
+import { switchMap, map, catchError, of, tap, mergeMap } from "rxjs";
+import { loadMessagesAndListen, loadMessagesSuccess, loadMessagesFailure, postMessage, postMessageSuccess, postMessageFailure, receiveMessage, receiveMessageError } from "./actions";
 import { Injectable } from "@angular/core";
 
 @Injectable()
 export class ChatMessagesEffects {
     public loadMessages = createEffect(() => this.actions.pipe(
-        ofType(loadMessages),
+        ofType(loadMessagesAndListen),
         switchMap(() => this.chatService.get().pipe(
             map(messages => loadMessagesSuccess({ messages })),
             catchError(error => of(loadMessagesFailure({ error })))
@@ -22,10 +22,21 @@ export class ChatMessagesEffects {
         ))
     ));
 
-    public reloadMessagesOnPost = createEffect(() => this.actions.pipe(
-        ofType(postMessageSuccess),
-        map(() => loadMessages())
+    public listenToMessages = createEffect(() => this.actions.pipe(
+        ofType(loadMessagesSuccess),
+        switchMap(() => this.chatService.listenToMessages().pipe(
+            map(message => receiveMessage({ message })),
+            catchError(error => of(receiveMessageError({ error })))
+        ))
     ));
+
+    // public reloadMessagesOnPost = createEffect(() => this.actions.pipe(
+    //     ofType(postMessageSuccess),
+    //     switchMap(() => this.chatService.get().pipe(
+    //         map(messages => loadMessagesSuccess({ messages })),
+    //         catchError(error => of(loadMessagesFailure({ error })))
+    //     ))
+    // ));
 
     public constructor(
         private readonly actions: Actions,

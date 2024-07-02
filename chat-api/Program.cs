@@ -1,9 +1,11 @@
 using Chat.API.Features.Messaging.Commands.Post;
+using Chat.API.Features.Messaging.Dtos;
 using Chat.API.Features.Messaging.Queries.List;
 using Chat.API.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Identity.Web;
 using System.Reflection;
 
@@ -28,6 +30,7 @@ builder.Services.AddCors(cfg =>
             .AllowAnyMethod();
     });
 });
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,19 +41,21 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-
 app.MapGet("/chat-messages", async (ISender mediatr) =>
 {
     var products = await mediatr.Send(new ListChatMessagesQuery());
     return Results.Ok(products);
 });
 
-app.MapPost("/chat-messages", async (PostChatMessageCommand command, ISender mediatr) =>
+app.MapPost("/chat-messages", async (PostChatMessageCommand command, ISender mediatr, IHubContext<ChatHub> hubContext) =>
 {
     var productId = await mediatr.Send(command);
     if (Guid.Empty == productId) return Results.BadRequest();
+    await hubContext.Clients.All.SendAsync("ReceiveMessage", new ChatMessageDto(productId, command.UserName, command.Message));
     return Results.Created($"/products/{productId}", new { id = productId });
 });
+
 app.UseCors("local-angular");
+app.MapHub<ChatHub>("/chat-hub");
+
 app.Run();

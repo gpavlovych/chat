@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { loadMessages, loadMessagesFailure, loadMessagesSuccess } from "./actions";
+import { loadMessagesFailure, loadMessagesSuccess, receiveMessage } from "./actions";
 import { HomeState } from "./state";
 
 const initialState: HomeState = {
@@ -18,7 +18,10 @@ const reducer = createReducer(
         ...state,
         error: action.error
     })),
-
+    on(receiveMessage, (state, { message }) => ({
+        ...state,
+        chatMessages: [...state.chatMessages, message]
+    })),
 );
 
 export default reducer;

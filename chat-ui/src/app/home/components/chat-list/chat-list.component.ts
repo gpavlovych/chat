@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { loadMessages, postMessage } from '../../store/actions';
+import { loadMessagesAndListen, postMessage } from '../../store/actions';
 import { selectChatMessages } from '../../store/selectors';
 import { ChatMessage } from '../../../server/models/chat-message';
 
@@ -15,7 +15,7 @@ export class ChatListComponent implements OnInit {
   public constructor(private readonly store: Store) {}
 
   public ngOnInit(): void {
-    this.store.dispatch(loadMessages());
+    this.store.dispatch(loadMessagesAndListen());
   }
 
   public onChatMessageSubmit(message: ChatMessage): void {
