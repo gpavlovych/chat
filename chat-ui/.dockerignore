@@ -1,0 +1,11 @@
+.git
+.editorconfig
+.vscode
+e2e
+docs
+.gitignore
+*.zip
+dist
+node_modules
+Dockerfile
+.dockerignore
