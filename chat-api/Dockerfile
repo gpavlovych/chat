@@ -22,5 +22,4 @@ RUN dotnet publish "./Chat.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV ASPNETCORE_URLS=http://*:80/;http://*:8080/;https://*:443/;https://*:8081/
 ENTRYPOINT ["dotnet", "Chat.API.dll"]
